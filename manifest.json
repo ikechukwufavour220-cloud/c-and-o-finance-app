@@ -1,0 +1,21 @@
+{
+  "name": "C&O Finance",
+  "short_name": "C&O Finance",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#27ae60",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://drive.google.com/uc?export=view&id=1NU4Gsu2MND3dn8bi4eQpuQJ1KnwWMLv5",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://drive.google.com/uc?export=view&id=1NU4Gsu2MND3dn8bi4eQpuQJ1KnwWMLv5",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

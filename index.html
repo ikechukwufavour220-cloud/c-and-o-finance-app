@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C&O Finance</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#27ae60">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="C&O Finance">
+<link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1NU4Gsu2MND3dn8bi4eQpuQJ1KnwWMLv5">
+
+<style>
+  body { font-family: Arial, sans-serif; background: #ffffff; padding: 10px; text-align: center; }
+  #logo-container { margin-bottom: 20px; }
+  #logo { max-width: 150px; display: block; margin: 0 auto; }
+  #brand-text { color: #27ae60; font-size: 20px; margin-top: 5px; font-weight: bold; }
+  h1 { color: #27ae60; margin-bottom: 15px; }
+  .filter { text-align: center; margin-bottom: 10px; }
+  .filter button { padding: 8px 12px; margin: 3px; border: none; border-radius: 5px; cursor: pointer; color: white; background: #27ae60; }
+  .post { background: #fff; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; text-align: left; }
+  .post img { max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 10px; }
+  .post h2 { margin: 0; color: #27ae60; }
+  .post p { margin: 5px 0; color: #555; }
+  .post a { display: inline-block; margin-top: 8px; color: #27ae60; text-decoration: none; font-weight: bold; }
+  .share { margin-top: 5px; }
+  button.share-btn { padding: 8px 12px; margin-right: 5px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+  .whatsapp { background: #25D366; }
+  .twitter { background: #1DA1F2; }
+</style>
+</head>
+<body>
+
+<!-- Logo with C&O Finance text below -->
+<div id="logo-container">
+  <img id="logo" src="https://drive.google.com/uc?export=view&id=1NU4Gsu2MND3dn8bi4eQpuQJ1KnwWMLv5" alt="C&O Finance Logo">
+  <div id="brand-text">C&amp;O Finance</div>
+</div>
+
+<h1>Wealth wise</h1>
+
+<div class="filter" id="category-filters">
+  <button onclick="filterPosts('All')">All</button>
+</div>
+
+<div id="posts">Loading side hustles...</div>
+
+<script>
+const apiURL = "https://api.sheetbest.com/sheets/5d1268a0-9ec1-4bef-aecf-cf0c6dba47e7";
+let allPosts = [];
+
+fetch(apiURL)
+  .then(res => res.json())
+  .then(data => {
+    allPosts = data;
+    createCategoryButtons(data);
+    displayPosts(allPosts);
+  })
+  .catch(err => {
+    document.getElementById("posts").innerHTML = "Failed to load side hustles.";
+    console.error(err);
+  });
+
+function displayPosts(posts) {
+  const container = document.getElementById("posts");
+  container.innerHTML = "";
+  posts.forEach(post => {
+    const div = document.createElement("div");
+    div.classList.add("post");
+    div.innerHTML = `
+      ${post.Image ? `<img src="${post.Image}" alt="${post.Title}">` : ''}
+      <h2>${post.Title}</h2>
+      <p>${post.Description}</p>
+      <a href="${post.Link}" target="_blank">Check it out</a>
+      <div class="share">
+        <button class="share-btn whatsapp" onclick="shareWhatsApp('${post.Title}', '${post.Link}')">Share WhatsApp</button>
+        <button class="share-btn twitter" onclick="shareTwitter('${post.Title}', '${post.Link}')">Share Twitter</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function createCategoryButtons(posts) {
+  const container = document.getElementById("category-filters");
+  const categories = [...new Set(posts.map(post => post.Category))];
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.innerText = cat;
+    btn.onclick = () => filterPosts(cat);
+    container.appendChild(btn);
+  });
+}
+
+function filterPosts(category) {
+  if (category === 'All') {
+    displayPosts(allPosts);
+  } else {
+    displayPosts(allPosts.filter(post => post.Category === category));
+  }
+}
+
+function shareWhatsApp(title, link) {
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + link)}`;
+  window.open(url, "_blank");
+}
+
+function shareTwitter(title, link) {
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title + " " + link)}`;
+  window.open(url, "_blank");
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('Service Worker Registered'));
+}
+</script>
+
+</body>
+</html>
