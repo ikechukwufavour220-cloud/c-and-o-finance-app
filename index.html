@@ -13,6 +13,11 @@
 <meta name="apple-mobile-web-app-title" content="Wealth Wise">
 <link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1NU4Gsu2MND3dn8bi4eQpuQJ1KnwWMLv5">
 
+<!-- Google AdSense -->
+<meta name="google-adsense-account" content="ca-pub-3675771807461406">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3675771807461406"
+     crossorigin="anonymous"></script>
+
 <style>
   body { font-family: Arial, sans-serif; background: #ffffff; padding: 10px; text-align: center; }
   #logo-container { margin-bottom: 20px; }
@@ -26,6 +31,8 @@
   .post h2 { margin: 0; color: #27ae60; }
   .post p { margin: 5px 0; color: #555; }
   .post a { display: inline-block; margin-top: 8px; color: #27ae60; text-decoration: none; font-weight: bold; }
+  .warning { color: red; font-weight: bold; margin-top: 5px; }
+  .premium { color: gold; font-weight: bold; margin-top: 5px; }
   .share { margin-top: 5px; }
   button.share-btn { padding: 8px 12px; margin-right: 5px; border: none; border-radius: 5px; cursor: pointer; color: white; }
   .whatsapp { background: #25D366; }
@@ -46,12 +53,39 @@
   <button onclick="filterPosts('All')">All</button>
 </div>
 
+<!-- Google AdSense Banner Above Posts -->
+<div style="margin: 10px 0;">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-3675771807461406"
+       data-ad-slot="1234567890"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
 <div id="posts">Loading side hustles...</div>
+
+<!-- Google AdSense Banner Below Posts -->
+<div style="margin: 10px 0;">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-3675771807461406"
+       data-ad-slot="0987654321"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
 
 <script>
 const apiURL = "https://api.sheetbest.com/sheets/5d1268a0-9ec1-4bef-aecf-cf0c6dba47e7";
 let allPosts = [];
 
+// Fetch posts
 fetch(apiURL)
   .then(res => res.json())
   .then(data => {
@@ -64,6 +98,7 @@ fetch(apiURL)
     console.error(err);
   });
 
+// Display posts
 function displayPosts(posts) {
   const container = document.getElementById("posts");
   container.innerHTML = "";
@@ -74,7 +109,9 @@ function displayPosts(posts) {
       ${post.Image ? `<img src="${post.Image}" alt="${post.Title}">` : ''}
       <h2>${post.Title}</h2>
       <p>${post.Description}</p>
-      <a href="${post.Link}" target="_blank">Check it out</a>
+      <a href="${post.AffiliateLink ? post.AffiliateLink : post.Link}" target="_blank">Check it out</a>
+      ${post.Premium === "Yes" ? '<p class="premium">Premium Content</p>' : ''}
+      ${post.Warning ? `<p class="warning">${post.Warning}</p>` : ''}
       <div class="share">
         <button class="share-btn whatsapp" onclick="shareWhatsApp('${post.Title}', '${post.Link}')">Share WhatsApp</button>
         <button class="share-btn twitter" onclick="shareTwitter('${post.Title}', '${post.Link}')">Share Twitter</button>
@@ -84,6 +121,7 @@ function displayPosts(posts) {
   });
 }
 
+// Create category buttons
 function createCategoryButtons(posts) {
   const container = document.getElementById("category-filters");
   const categories = [...new Set(posts.map(post => post.Category))];
@@ -95,6 +133,7 @@ function createCategoryButtons(posts) {
   });
 }
 
+// Filter posts by category
 function filterPosts(category) {
   if (category === 'All') {
     displayPosts(allPosts);
@@ -103,6 +142,7 @@ function filterPosts(category) {
   }
 }
 
+// Share functions
 function shareWhatsApp(title, link) {
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + link)}`;
   window.open(url, "_blank");
