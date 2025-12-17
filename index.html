@@ -19,24 +19,25 @@
      crossorigin="anonymous"></script>
 
 <style>
-  body { font-family: Arial, sans-serif; background: #ffffff; padding: 10px; text-align: center; }
-  #logo-container { margin-bottom: 20px; }
-  #logo { max-width: 150px; display: block; margin: 0 auto; }
-  #brand-text { color: #27ae60; font-size: 20px; margin-top: 5px; font-weight: bold; }
-  h1 { color: #27ae60; margin-bottom: 15px; }
-  .filter { text-align: center; margin-bottom: 10px; }
-  .filter button { padding: 8px 12px; margin: 3px; border: none; border-radius: 5px; cursor: pointer; color: white; background: #27ae60; }
-  .post { background: #fff; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; text-align: left; }
-  .post img { max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 10px; }
-  .post h2 { margin: 0; color: #27ae60; }
-  .post p { margin: 5px 0; color: #555; }
-  .post a { display: inline-block; margin-top: 8px; color: #27ae60; text-decoration: none; font-weight: bold; }
-  .warning { color: red; font-weight: bold; margin-top: 5px; }
-  .premium { color: gold; font-weight: bold; margin-top: 5px; }
-  .share { margin-top: 5px; }
-  button.share-btn { padding: 8px 12px; margin-right: 5px; border: none; border-radius: 5px; cursor: pointer; color: white; }
-  .whatsapp { background: #25D366; }
-  .twitter { background: #1DA1F2; }
+body { font-family: Arial, sans-serif; background: #ffffff; padding: 10px; text-align: center; }
+#logo-container { margin-bottom: 20px; }
+#logo { max-width: 150px; display: block; margin: 0 auto; }
+#brand-text { color: #27ae60; font-size: 20px; margin-top: 5px; font-weight: bold; }
+h1 { color: #27ae60; margin-bottom: 15px; }
+.filter { text-align: center; margin-bottom: 10px; }
+.filter button { padding: 8px 12px; margin: 3px; border: none; border-radius: 5px; cursor: pointer; color: white; background: #27ae60; }
+.post { background: #fff; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; text-align: left; }
+.post img { max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 10px; }
+.post h2 { margin: 0; color: #27ae60; }
+.post p { margin: 5px 0; color: #555; }
+.post a { display: inline-block; margin-top: 8px; color: #27ae60; text-decoration: none; font-weight: bold; }
+.warning { color: red; font-weight: bold; margin-top: 5px; }
+.share { margin-top: 5px; }
+button.share-btn { padding: 8px 12px; margin-right: 5px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+.whatsapp { background: #25D366; }
+.twitter { background: #1DA1F2; }
+.banner-ad img { width: 100%; border-radius: 10px; }
+.banner-ad h2, .banner-ad p { color: #fff; background: #27ae60; padding: 10px; margin-top: -5px; }
 </style>
 </head>
 <body>
@@ -53,7 +54,7 @@
   <button onclick="filterPosts('All')">All</button>
 </div>
 
-<!-- Google AdSense Banner Above Posts -->
+<!-- AdSense Banner Above Posts -->
 <div style="margin: 10px 0;">
   <ins class="adsbygoogle"
        style="display:block"
@@ -68,7 +69,7 @@
 
 <div id="posts">Loading side hustles...</div>
 
-<!-- Google AdSense Banner Below Posts -->
+<!-- AdSense Banner Below Posts -->
 <div style="margin: 10px 0;">
   <ins class="adsbygoogle"
        style="display:block"
@@ -85,7 +86,7 @@
 const apiURL = "https://api.sheetbest.com/sheets/5d1268a0-9ec1-4bef-aecf-cf0c6dba47e7";
 let allPosts = [];
 
-// Fetch posts
+// Fetch posts from Google Sheet
 fetch(apiURL)
   .then(res => res.json())
   .then(data => {
@@ -98,25 +99,39 @@ fetch(apiURL)
     console.error(err);
   });
 
-// Display posts
+// Display posts including banner ads
 function displayPosts(posts) {
   const container = document.getElementById("posts");
   container.innerHTML = "";
   posts.forEach(post => {
     const div = document.createElement("div");
-    div.classList.add("post");
-    div.innerHTML = `
-      ${post.Image ? `<img src="${post.Image}" alt="${post.Title}">` : ''}
-      <h2>${post.Title}</h2>
-      <p>${post.Description}</p>
-      <a href="${post.AffiliateLink ? post.AffiliateLink : post.Link}" target="_blank">Check it out</a>
-      ${post.Premium === "Yes" ? '<p class="premium">Premium Content</p>' : ''}
-      ${post.Warning ? `<p class="warning">${post.Warning}</p>` : ''}
-      <div class="share">
-        <button class="share-btn whatsapp" onclick="shareWhatsApp('${post.Title}', '${post.Link}')">Share WhatsApp</button>
-        <button class="share-btn twitter" onclick="shareTwitter('${post.Title}', '${post.Link}')">Share Twitter</button>
-      </div>
-    `;
+    
+    if(post.IsBanner === "Yes") {
+      // Banner ad
+      div.classList.add("banner-ad");
+      div.innerHTML = `
+        <a href="${post.AffiliateLink ? post.AffiliateLink : post.Link}" target="_blank" style="text-decoration:none;">
+          <img src="${post.Image}" alt="${post.Title}">
+          <h2>${post.Title}</h2>
+          <p>${post.Description}</p>
+        </a>
+      `;
+    } else {
+      // Regular post
+      div.classList.add("post");
+      div.innerHTML = `
+        ${post.Image ? `<img src="${post.Image}" alt="${post.Title}">` : ''}
+        <h2>${post.Title}</h2>
+        <p>${post.Description}</p>
+        <a href="${post.AffiliateLink ? post.AffiliateLink : post.Link}" target="_blank">Check it out</a>
+        ${post.Warning ? `<p class="warning">${post.Warning}</p>` : ''}
+        <div class="share">
+          <button class="share-btn whatsapp" onclick="shareWhatsApp('${post.Title}', '${post.Link}')">Share WhatsApp</button>
+          <button class="share-btn twitter" onclick="shareTwitter('${post.Title}', '${post.Link}')">Share Twitter</button>
+        </div>
+      `;
+    }
+
     container.appendChild(div);
   });
 }
@@ -135,7 +150,7 @@ function createCategoryButtons(posts) {
 
 // Filter posts by category
 function filterPosts(category) {
-  if (category === 'All') {
+  if(category === "All") {
     displayPosts(allPosts);
   } else {
     displayPosts(allPosts.filter(post => post.Category === category));
@@ -144,21 +159,18 @@ function filterPosts(category) {
 
 // Share functions
 function shareWhatsApp(title, link) {
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + link)}`;
-  window.open(url, "_blank");
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + link)}`, "_blank");
 }
-
 function shareTwitter(title, link) {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title + " " + link)}`;
-  window.open(url, "_blank");
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title + " " + link)}`, "_blank");
 }
 
 // Register service worker
-if ('serviceWorker' in navigator) {
+if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js')
     .then(() => console.log('Service Worker Registered'));
 }
 </script>
 
 </body>
-  </html>
+</html>
